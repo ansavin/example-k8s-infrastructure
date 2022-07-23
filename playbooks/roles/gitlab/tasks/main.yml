@@ -1,0 +1,55 @@
+---
+# tasks file for gitlab
+
+- name: Add a Gitlab repository
+  kubernetes.core.helm_repository:
+    repo_name: gitlab
+    repo_url: https://charts.gitlab.io/
+
+- name: Deploy latest version of Gitlab chart inside tools namespace (and create it)
+  kubernetes.core.helm:
+    name: gitlab
+    chart_ref: gitlab/gitlab
+    release_namespace: "{{ namespace }}"
+    create_namespace: true
+    values: "{{ lookup('template', 'gitlab.yml') | from_yaml }}"
+
+- name: Get Gitlab IP
+  shell: minikube service list -n "{{ namespace }}" | grep 'gitlab-nginx-ingress-controller ' | tr -s ' ' | cut -d ' ' -f 8 | cut -d ':' -f 2 | sed 's://::g'
+  register: gitlab_ip
+
+- set_fact:
+    gitlab_ip: "{{ gitlab_ip.stdout }}"
+
+- name: Add domain to /etc/hosts
+  become: yes
+  shell: if [ -z $(cat /etc/hosts | grep {{ gitlab_domain }}) ];
+    then 
+      echo "# gitlab installation in minikube" >> /etc/hosts;
+      echo "{{ subdomains }}" | while IFS= read -r domain;
+        do echo "{{ gitlab_ip }} $domain" >> /etc/hosts;
+      done;
+    fi
+
+- name: Get Gitlab TCP port
+  shell: minikube service list -n "{{ namespace }}" | grep "{{ gitlab_ip }}" | grep 'http/80' | tr -s ' ' | cut -d ' ' -f 8 | cut -d ':' -f 3
+  register: gitlab_port
+
+- set_fact:
+    gitlab_port: "{{ gitlab_port.stdout }}"
+
+- name: Get Gitlab root password
+  shell: kubectl get secret gitlab-gitlab-initial-root-password -ojsonpath='{.data.password}' -n {{ namespace }} | base64 --decode ; echo
+  register: gitlab_password
+
+- set_fact:
+    gitlab_password: "{{ gitlab_password.stdout }}"
+
+- name: Write data for Gitlab access to a file
+  copy:
+    dest: "../GITLAB_ACCESS.md"
+    content: |
+      To access gitlab thow your browser, use following URL
+      http://{{ gitlab_subdomain }}:{{ gitlab_port }}
+      Login:root
+      Password:{{ gitlab_password }}

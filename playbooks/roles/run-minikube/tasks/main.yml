@@ -1,0 +1,9 @@
+---
+# tasks file for run-minikube
+
+- name: Run minikube
+  shell: minikube start
+
+- name: Install Kubernetes dashboard in minikube
+  shell: minikube dashboard &
+  when: run_dashboard

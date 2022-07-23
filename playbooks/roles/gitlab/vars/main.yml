@@ -1,0 +1,18 @@
+---
+# vars file for gitlab
+
+namespace: tools
+gitlab_domain: gitlab.lan
+gitlab_subdomain: gitlab.{{ gitlab_domain }}
+registry_subdomain: registry.{{ gitlab_domain }}
+minio_subdomain: minio.{{ gitlab_domain }}
+smartcard_subdomain: smartcard.{{ gitlab_domain }}
+kas_subdomain: kas.{{ gitlab_domain }}
+pages_subdomain: pages.{{ gitlab_domain }}
+subdomains: |
+  {{ gitlab_subdomain }}
+  {{ registry_subdomain }}
+  {{ minio_subdomain }}
+  {{ smartcard_subdomain }}
+  {{ kas_subdomain }}
+  {{ pages_subdomain }}

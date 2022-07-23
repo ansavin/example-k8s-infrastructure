@@ -1,0 +1,4 @@
+---
+# vars file for run-minikube
+
+run_dashboard: false

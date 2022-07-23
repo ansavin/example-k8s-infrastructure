@@ -1,0 +1,27 @@
+certmanager:
+  install: false
+
+global:
+  ingress:
+    configureCertmanager: false
+  hosts:
+    domain: "{{ gitlab_domain }}"
+    https: false
+    externalIP:
+      gitlab:
+        name: "{{ gitlab_subdomain }}"
+        https: false
+      registry:
+        name: "{{ registry_subdomain }}"
+        https: false
+      minio:
+        name: "{{ minio_subdomain }}"
+        https: false
+      smartcard:
+        name: "{{ smartcard_subdomain }}"
+      kas:
+        name: "{{ kas_subdomain }}"
+      pages:
+        name: "{{ pages_subdomain }}"
+        https: false
+    ssh: "{{ gitlab_subdomain }}"
