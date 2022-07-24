@@ -1,9 +1,11 @@
-certmanager:
-  install: false
+certmanager-issuer:
+  email: "{{ certmanager_email }}"
 
 global:
   ingress:
-    configureCertmanager: false
+    tls:
+      enabled: false
+  https: false
   hosts:
     domain: "{{ gitlab_domain }}"
     https: false

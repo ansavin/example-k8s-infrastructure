@@ -15,7 +15,7 @@
     values: "{{ lookup('template', 'gitlab.yml') | from_yaml }}"
 
 - name: Get Gitlab IP
-  shell: minikube service list -n "{{ namespace }}" | grep 'gitlab-nginx-ingress-controller ' | tr -s ' ' | cut -d ' ' -f 8 | cut -d ':' -f 2 | sed 's://::g'
+  shell: kubectl get svc -n "{{ namespace }}" | grep 'gitlab-nginx-ingress-controller ' | tr -s ' ' | cut -d ' ' -f 4
   register: gitlab_ip
 
 - set_fact:
@@ -31,13 +31,6 @@
       done;
     fi
 
-- name: Get Gitlab TCP port
-  shell: minikube service list -n "{{ namespace }}" | grep "{{ gitlab_ip }}" | grep 'http/80' | tr -s ' ' | cut -d ' ' -f 8 | cut -d ':' -f 3
-  register: gitlab_port
-
-- set_fact:
-    gitlab_port: "{{ gitlab_port.stdout }}"
-
 - name: Get Gitlab root password
   shell: kubectl get secret gitlab-gitlab-initial-root-password -ojsonpath='{.data.password}' -n {{ namespace }} | base64 --decode ; echo
   register: gitlab_password
@@ -50,6 +43,6 @@
     dest: "../GITLAB_ACCESS.md"
     content: |
       To access gitlab thow your browser, use following URL
-      http://{{ gitlab_subdomain }}:{{ gitlab_port }}
+      http://{{ gitlab_subdomain }}
       Login:root
       Password:{{ gitlab_password }}

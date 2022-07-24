@@ -2,7 +2,8 @@
 # vars file for gitlab
 
 namespace: tools
-gitlab_domain: gitlab.lan
+gitlab_domain: example.lan
+certmanager_email: admin@{{ gitlab_domain }}
 gitlab_subdomain: gitlab.{{ gitlab_domain }}
 registry_subdomain: registry.{{ gitlab_domain }}
 minio_subdomain: minio.{{ gitlab_domain }}
